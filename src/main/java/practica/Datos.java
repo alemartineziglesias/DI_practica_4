@@ -7,6 +7,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class Datos 
 {
@@ -150,7 +151,7 @@ public class Datos
 		return errorSQL;
 	}
 
-	public boolean altaTicket(String fecha, BigDecimal total, String articulo)
+	public boolean altaTicket(String fecha, BigDecimal total, ArrayList<String> articulos)
 	{
 		boolean finalizado = true;
 		int idTicket = 0;
@@ -176,8 +177,11 @@ public class Datos
 				idTicket = resultado.getInt("max_id");
 				System.out.println(idTicket);
 			}
-			String comando_2 = "INSERT INTO compras (idArticuloFK, idTicketFK) VALUES (" + articulo.split("-")[0] + ", " + idTicket + ")";
-			sentencia.executeUpdate(comando_2);
+			for(String articulo : articulos)
+			{
+				String comando_2 = "INSERT INTO compras (idArticuloFK, idTicketFK) VALUES (" + articulo + ", " + idTicket + ")";
+				sentencia.executeUpdate(comando_2);
+			}
 			resultado.close();
 			sentencia.close();
 		} 

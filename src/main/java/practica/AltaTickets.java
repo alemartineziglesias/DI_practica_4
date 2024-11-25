@@ -10,6 +10,8 @@ import java.awt.event.ActionListener;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
+
 import javax.swing.JTextField;
 import javax.swing.JComboBox;
 import javax.swing.JButton;
@@ -21,24 +23,25 @@ public class AltaTickets extends JFrame
 	private JTextField textFieldFecha;
 	private JTextField textFieldTotal;
 	private Datos datos = new Datos();
+	private ArrayList<String> articulos = new ArrayList<String>();
 
 	public AltaTickets() 
 	{
 		setTitle("Tickets -> Alta");
 		setDefaultCloseOperation(JFrame.HIDE_ON_CLOSE);
-		setBounds(100, 100, 450, 300);
+		setBounds(100, 100, 450, 331);
 		setLocationRelativeTo(null);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));
 
 		setContentPane(contentPane);
 		contentPane.setLayout(null);
-		
+
 		JLabel lblNewLabel = new JLabel("Fecha:");
 		lblNewLabel.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblNewLabel.setBounds(205, 11, 36, 14);
 		contentPane.add(lblNewLabel);
-		
+
 		textFieldFecha = new JTextField();
 		textFieldFecha.setBounds(127, 36, 193, 20);
 		textFieldFecha.setColumns(10);
@@ -47,24 +50,24 @@ public class AltaTickets extends JFrame
 		String hoy = fechaActual.format(formatter);
 		textFieldFecha.setText(hoy);
 		contentPane.add(textFieldFecha);
-		
-		
+
+
 		JLabel lblTotal = new JLabel("Total:");
 		lblTotal.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblTotal.setBounds(207, 67, 36, 14);
 		contentPane.add(lblTotal);
-		
+
 		textFieldTotal = new JTextField();
 		textFieldTotal.setColumns(10);
 		textFieldTotal.setBounds(127, 92, 193, 20);
 		textFieldTotal.setText("0.00");
 		contentPane.add(textFieldTotal);
-		
+
 		JLabel lblArtculo = new JLabel("Artículo:");
 		lblArtculo.setFont(new Font("Tahoma", Font.PLAIN, 12));
 		lblArtculo.setBounds(203, 123, 45, 14);
 		contentPane.add(lblArtculo);
-		
+
 		JComboBox<String> comboBox = new JComboBox<String>();
 		comboBox.setBounds(127, 148, 193, 20);
 		String[] elementos = datos.rellenarArticulos();
@@ -74,8 +77,22 @@ public class AltaTickets extends JFrame
 		}
 		contentPane.add(comboBox);
 		
+		JButton btnAnadir = new JButton("Añadir");
+		btnAnadir.setBounds(182, 192, 89, 35);
+		btnAnadir.addActionListener(new ActionListener()
+		{
+			@Override
+			public void actionPerformed(ActionEvent e) 
+			{
+				articulos.add(((String) comboBox.getSelectedItem()).split("-")[0]);
+				Dialogo dialogo = new Dialogo("Artículo añadido");
+				dialogo.setVisible(true);
+			}
+		});
+		contentPane.add(btnAnadir);
+
 		JButton btnAgregar = new JButton("Agregar");
-		btnAgregar.setBounds(84, 199, 89, 35);
+		btnAgregar.setBounds(86, 246, 89, 35);
 		btnAgregar.addActionListener(new ActionListener() 
 		{
 			@Override
@@ -125,14 +142,15 @@ public class AltaTickets extends JFrame
 						{
 							BigDecimal total = new BigDecimal(Float.parseFloat(textFieldTotal.getText()));
 							total = total.setScale(2);
-							if(datos.altaTicket(textFieldFecha.getText(), total, ((String) comboBox.getSelectedItem()).split("-")[0]) == true)
+							if(datos.altaTicket(textFieldFecha.getText(), total, articulos) == true)
 							{
-								Dialogo dialogo = new Dialogo("Artículo creado");
+								Dialogo dialogo = new Dialogo("Ticket creado");
 								dialogo.setVisible(true);
 								textFieldFecha.setText(hoy);
 								textFieldTotal.setText("0.00");
 								comboBox.setSelectedItem(0);
 								textFieldFecha.requestFocus();
+								articulos.clear();
 							}
 							else
 							{
@@ -140,11 +158,6 @@ public class AltaTickets extends JFrame
 								dialogo.setVisible(true);
 							}
 						}
-					}
-					else
-					{
-						Dialogo dialogo = new Dialogo("Debe elegir un artículo");
-						dialogo.setVisible(true);
 					}
 				}
 				catch(NumberFormatException nfe)
@@ -155,9 +168,9 @@ public class AltaTickets extends JFrame
 			}
 		});
 		contentPane.add(btnAgregar);
-		
+
 		JButton btnCancelar = new JButton("Cancelar");
-		btnCancelar.setBounds(276, 199, 89, 35);
+		btnCancelar.setBounds(276, 246, 89, 35);
 		btnCancelar.addActionListener(new ActionListener()
 		{
 			@Override
